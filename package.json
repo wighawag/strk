@@ -1,6 +1,6 @@
 {
   "name": "strk",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "",
   "type": "module",
   "main": "./dist/index.js",
@@ -13,10 +13,16 @@
         "default": "./dist/index.js"
       }
     },
+    "./utils": {
+      "import": {
+        "types": "./dist/utils.d.ts",
+        "default": "./dist/utils.js"
+      }
+    },
     "./katana": {
       "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/katana.d.ts",
+        "default": "./dist/katana.js"
       }
     }
   },
