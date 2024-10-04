@@ -1,0 +1,42 @@
+{
+  "name": "strk",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./katana": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "dependencies": {
+    "@scure/starknet": "^1.0.0",
+    "starknet-core": "^0.0.2"
+  },
+  "devDependencies": {
+    "as-soon": "^0.0.9",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "as-soon -w src pnpm build",
+    "start": "ska",
+    "format:check": "prettier --check ."
+  }
+}
