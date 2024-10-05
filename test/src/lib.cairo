@@ -6,13 +6,16 @@ trait IGreetingsRegistry<ContractState> {
     fn messages(self: @ContractState, user: ContractAddress) -> GreetingsRegistry::Message;
     fn lastGreetingOf(self: @ContractState, user: ContractAddress) -> felt252;
     fn prefix(self: @ContractState) -> felt252;
-    fn isDelegate(self: @ContractState, account: ContractAddress, delegated: ContractAddress) -> bool;
+    fn isDelegate(
+        self: @ContractState, account: ContractAddress, delegated: ContractAddress
+    ) -> bool;
 
     // WRITES
     fn setMessage(ref self: ContractState, message: felt252, dayTimeInSeconds: u32);
-    fn setMessageFor(ref self: ContractState, account: ContractAddress, message: felt252, dayTimeInSeconds: u32);
+    fn setMessageFor(
+        ref self: ContractState, account: ContractAddress, message: felt252, dayTimeInSeconds: u32
+    );
     fn delegate(ref self: ContractState, to: ContractAddress, yes: bool);
-
 }
 
 #[starknet::contract]
@@ -22,7 +25,7 @@ mod GreetingsRegistry {
     };
     use starknet::{get_caller_address};
     use core::starknet::ContractAddress;
-   
+
 
     // --------------------------------------------------------------------------------------------
     // STORAGE
@@ -33,7 +36,7 @@ mod GreetingsRegistry {
         timestamp: felt252,
         dayTimeInSeconds: u32
     }
-    
+
     #[storage]
     struct Storage {
         prefix: felt252,
@@ -73,7 +76,6 @@ mod GreetingsRegistry {
     }
     // --------------------------------------------------------------------------------------------
 
-    
     // --------------------------------------------------------------------------------------------
     // ERRORS
     // --------------------------------------------------------------------------------------------
@@ -96,7 +98,6 @@ mod GreetingsRegistry {
     // --------------------------------------------------------------------------------------------
     #[abi(embed_v0)]
     impl GreetingsRegistryImpl of super::IGreetingsRegistry<ContractState> {
-
         // ----------------------------------------------------------------------------------------
         // READS
         // ----------------------------------------------------------------------------------------
@@ -109,7 +110,9 @@ mod GreetingsRegistry {
         fn prefix(self: @ContractState) -> felt252 {
             self.prefix.read()
         }
-        fn isDelegate(self: @ContractState, account: ContractAddress, delegated: ContractAddress) -> bool {
+        fn isDelegate(
+            self: @ContractState, account: ContractAddress, delegated: ContractAddress
+        ) -> bool {
             self.delegates.entry(account).entry(delegated).read()
         }
         // ----------------------------------------------------------------------------------------
@@ -121,9 +124,14 @@ mod GreetingsRegistry {
             let sender = get_caller_address();
             self._setMessageFor(sender, message, dayTimeInSeconds)
         }
-        fn setMessageFor(ref self: ContractState, account: ContractAddress, message: felt252, dayTimeInSeconds: u32) {
+        fn setMessageFor(
+            ref self: ContractState,
+            account: ContractAddress,
+            message: felt252,
+            dayTimeInSeconds: u32
+        ) {
             let sender = get_caller_address();
-            assert( self.delegates.entry(account).entry(sender).read(),  Errors::UNAUTHORIZED);
+            assert(self.delegates.entry(account).entry(sender).read(), Errors::UNAUTHORIZED);
             self._setMessageFor(account, message, dayTimeInSeconds)
         }
         fn delegate(ref self: ContractState, to: ContractAddress, yes: bool) {
@@ -141,16 +149,35 @@ mod GreetingsRegistry {
     // --------------------------------------------------------------------------------------------
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn _setMessageFor(ref self: ContractState, account: ContractAddress, message: felt252, dayTimeInSeconds: u32) {
-            // TODO string memory actualMessage = string(bytes.concat(bytes(_prefix), bytes(message)));
+        fn _setMessageFor(
+            ref self: ContractState,
+            account: ContractAddress,
+            message: felt252,
+            dayTimeInSeconds: u32
+        ) {
+            // TODO string memory actualMessage = string(bytes.concat(bytes(_prefix),
+            // bytes(message)));
             let actual_message = message;
             let timestamp = 1; // TODO
-            self.messages.entry(account).write(Message {
-                content: actual_message,
-                timestamp: timestamp,
-                dayTimeInSeconds: dayTimeInSeconds
-            });
-            self.emit(MessageChanged { user: account, timestamp: timestamp, dayTimeInSeconds: dayTimeInSeconds, message: actual_message });
+            self
+                .messages
+                .entry(account)
+                .write(
+                    Message {
+                        content: actual_message,
+                        timestamp: timestamp,
+                        dayTimeInSeconds: dayTimeInSeconds
+                    }
+                );
+            self
+                .emit(
+                    MessageChanged {
+                        user: account,
+                        timestamp: timestamp,
+                        dayTimeInSeconds: dayTimeInSeconds,
+                        message: actual_message
+                    }
+                );
         }
     }
     // ----------------------------------------------------------------------------------------

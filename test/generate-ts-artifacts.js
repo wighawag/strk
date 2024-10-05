@@ -63,12 +63,10 @@ for (const pakcageName of Object.keys(packages)) {
       class_hash: classHash,
     };
 
-    console.log(`${contractName}`, JSON.stringify(artifact));
-
     fs.mkdirSync(tsArtifactsFolder, { recursive: true });
     fs.writeFileSync(
       path.join(tsArtifactsFolder, `${contractName}.ts`),
-      `export default  ${JSON.stringify(artifact, null, 2)} as  const;`,
+      `export default  ${JSON.stringify(artifact, null, 2)} as  const;`
     );
   }
 }
