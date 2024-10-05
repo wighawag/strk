@@ -37,7 +37,12 @@ const declare_transaction_for_estimate = create_declare_transaction_v2({
 const estimateFeeResponse = await rpc.starknet_estimateFee({
   block_id: "latest",
   request: [declare_transaction_for_estimate],
-  simulation_flags: [], // TODO fix starknet-io/type-js or katana ? seems to be mandatory field
+  simulation_flags: [],
+  //   simulation_flags: ["SKIP_VALIDATE"],
+  // TODO fix starknet-io/type-js or katana ? seems to be mandatory field
+  // TODO wehn using "SKIP_VALIDATE" as simulation_flags element, the estimated fee is off
+  // but katana do not reject the tx with that fee, and instead drop the tx at a later stage
+  // this result in `waitForTransaction` to hang forever
 });
 
 if (!estimateFeeResponse.success) {
@@ -56,6 +61,8 @@ const declare_transaction = create_declare_transaction_v2({
 const declareResponse = await rpc.starknet_addDeclareTransaction({
   declare_transaction,
 });
+
+console.log(JSON.stringify(declareResponse));
 
 if (!declareResponse.success) {
   console.log(declareResponse.error);
