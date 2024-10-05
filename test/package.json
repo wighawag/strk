@@ -1,0 +1,23 @@
+{
+  "name": "tests-starknet",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "starknet-core": "^0.0.3",
+    "strk": "^0.0.12"
+  },
+  "devDependencies": {
+    "@starknet-io/types-js": "^0.7.7",
+    "@types/node": "^22.7.4",
+    "prettier": "^3.2.5",
+    "prool": "^0.0.16",
+    "prool-katana": "^0.0.2",
+    "remote-procedure-call": "^0.0.12",
+    "vitest": "^2.1.2"
+  },
+  "scripts": {
+    "test": "vitest",
+    "format:check": "prettier --check ."
+  }
+}

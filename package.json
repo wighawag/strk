@@ -42,7 +42,6 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "as-soon -w src pnpm build",
-    "start": "ska",
     "format:check": "prettier --check ."
   }
 }
