@@ -1,6 +1,6 @@
 import { createServer } from "prool";
 import { katana } from "prool-katana";
-import { poolId } from ".";
+import { poolId } from "./index.js";
 
 export const main = defineKatana();
 

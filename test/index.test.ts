@@ -2,7 +2,7 @@ import { test, expect } from "vitest";
 import { createProxiedJSONRPC } from "remote-procedure-call";
 import { Methods as StarknetMethods } from "@starknet-io/types-js";
 import assert from "assert";
-import { RPC_URL } from "./prool";
+import { RPC_URL } from "./prool/index.js";
 import {
   create_declare_transaction_v2,
   create_invoke_transaction_v1_from_calls,
@@ -22,24 +22,15 @@ import {
 } from "starknet-core/utils/hash";
 import { toHex } from "starknet-core/utils/num";
 import { starknetKeccak } from "starknet-core/utils/hash";
-import GreetingsRegistry from "./ts-artifacts/GreetingsRegistry";
+import GreetingsRegistry from "./ts-artifacts/GreetingsRegistry.js";
 import {
   KATANA_CHAIN_ID,
   test_accounts,
   UniversalDeployerContract,
-} from "./katana";
+} from "./katana.js";
+import { waitForTransaction } from "./utils.js";
 
 const rpc = createProxiedJSONRPC<StarknetMethods>(RPC_URL);
-
-async function waitForTransaction(transaction_hash: string) {
-  let txResponse = await rpc.starknet_getTransactionReceipt({
-    transaction_hash,
-  });
-  while (!(txResponse.success && txResponse.value.block_hash)) {
-    txResponse = await rpc.starknet_getTransactionReceipt({ transaction_hash });
-  }
-  return txResponse.value;
-}
 
 test("starknet_chainId", async function () {
   const chainIdResponse = await rpc.starknet_chainId();
@@ -57,10 +48,37 @@ test("declare_GreetingsRegistry", async function () {
     sender_address: test_accounts[0].contract_address,
     private_key: test_accounts[0].private_key,
   });
-  const chainIdResponse = await rpc.starknet_addDeclareTransaction({
+  const declareResponse = await rpc.starknet_addDeclareTransaction({
     declare_transaction,
   });
-  expect(chainIdResponse.success).to.be.true;
+  expect(declareResponse.success).to.be.true;
+  assert(declareResponse.success);
+  let receipt = await waitForTransaction(
+    rpc,
+    declareResponse.value.transaction_hash
+  );
+  expect(receipt.execution_status).to.equals("SUCCEEDED");
+});
+
+test("declare_GreetingsRegistry_again", async function () {
+  const declare_transaction = create_declare_transaction_v2({
+    chain_id: KATANA_CHAIN_ID,
+    contract: GreetingsRegistry,
+    max_fee: "0xFFFFFFFFFFFFFFFFFF",
+    nonce: "0x1",
+    sender_address: test_accounts[0].contract_address,
+    private_key: test_accounts[0].private_key,
+  });
+  const declareResponse = await rpc.starknet_addDeclareTransaction({
+    declare_transaction,
+  });
+  expect(declareResponse.success).to.be.true;
+  assert(declareResponse.success);
+  let receipt = await waitForTransaction(
+    rpc,
+    declareResponse.value.transaction_hash
+  );
+  expect(receipt.execution_status).to.equals("SUCCEEDED");
 });
 
 let contractAddress: string;
@@ -93,7 +111,10 @@ test("deploy_GreetingsRegistry", async function () {
   expect(invokeResponse.success).to.be.true;
 
   assert(invokeResponse.success);
-  let receipt = await waitForTransaction(invokeResponse.value.transaction_hash);
+  let receipt = await waitForTransaction(
+    rpc,
+    invokeResponse.value.transaction_hash
+  );
   expect(receipt.execution_status).to.equals("SUCCEEDED");
 
   // const lastBlockResponse = await rpc.starknet_blockNumber();
@@ -123,13 +144,13 @@ test("deploy_GreetingsRegistry", async function () {
         computePedersenHash(test_accounts[0].contract_address, salt),
         GreetingsRegistry.class_hash,
         [prefix],
-        UniversalDeployerContract.contract_address,
+        UniversalDeployerContract.contract_address
       )
     : calculateContractAddressFromHash(
         salt,
         GreetingsRegistry.class_hash,
         [prefix],
-        0,
+        0
       );
   expect(contractAddress).to.equals(expectedContractAddress);
 });
@@ -141,7 +162,7 @@ test("invoke_GreetingsRegistry", async function () {
       contract_address: contractAddress,
       calldata: [test_accounts[0].contract_address],
       entry_point: "lastGreetingOf",
-    }),
+    })
   );
   expect(precallResponse.success).to.be.true;
   assert(precallResponse.success);
@@ -172,7 +193,10 @@ test("invoke_GreetingsRegistry", async function () {
   });
   expect(invokeResponse.success).to.be.true;
   assert(invokeResponse.success);
-  let receipt = await waitForTransaction(invokeResponse.value.transaction_hash);
+  let receipt = await waitForTransaction(
+    rpc,
+    invokeResponse.value.transaction_hash
+  );
   expect(receipt.execution_status).to.equals("SUCCEEDED");
 
   const callResponse = await rpc.starknet_call(
@@ -183,7 +207,7 @@ test("invoke_GreetingsRegistry", async function () {
       contract_address: contractAddress,
       calldata: [test_accounts[0].contract_address],
       entry_point: "lastGreetingOf",
-    }),
+    })
   );
   expect(callResponse.success).to.be.true;
   assert(callResponse.success);
@@ -191,3 +215,58 @@ test("invoke_GreetingsRegistry", async function () {
   expect(callResponse.value[0]).to.equals(messageAsFelt);
   expect(decodeShortString(callResponse.value[0])).to.equals(message);
 });
+
+// ------------------------------------------------------------------------------------------------
+// EXPERIMENTS
+// ------------------------------------------------------------------------------------------------
+
+// export type Invocation = {
+//   method: string;
+//   args?: any[];
+// };
+
+// type Abi = any[];
+
+// export type AbiStateMutability = "pure" | "view" | "nonpayable" | "payable";
+
+// export type ContractFunctionName<
+//   abi extends Abi | readonly unknown[] = Abi,
+//   mutability extends AbiStateMutability = AbiStateMutability,
+// > =
+//   ExtractAbiFunctionNames<
+//     abi extends Abi ? abi : Abi,
+//     mutability
+//   > extends infer functionName extends string
+//     ? [functionName] extends [never]
+//       ? string
+//       : functionName
+//     : string;
+
+// export type ContractInvocations<
+//   abi extends Abi | readonly unknown[] = Abi,
+//   mutability extends AbiStateMutability = AbiStateMutability,
+//   functionName extends ContractFunctionName<
+//     abi,
+//     mutability
+//   > = ContractFunctionName<abi, mutability>,
+//   args extends ContractFunctionArgs<
+//     abi,
+//     mutability,
+//     functionName
+//   > = ContractFunctionArgs<abi, mutability, functionName>,
+//   deployless extends boolean = false,
+//   ///
+//   allFunctionNames = ContractFunctionName<abi, mutability>,
+//   allArgs = ContractFunctionArgs<abi, mutability, functionName>,
+//   // when `args` is inferred to `readonly []` ("inputs": []) or `never` (`abi` declared as `Abi` or not inferrable), allow `args` to be optional.
+//   // important that both branches return same structural type
+// > = {
+//   abi: abi;
+//   functionName:
+//     | allFunctionNames // show all options
+//     | (functionName extends allFunctionNames ? functionName : never); // infer value
+//   args?: (abi extends Abi ? UnionWiden<args> : never) | allArgs | undefined;
+// } & (readonly [] extends allArgs ? {} : { args: Widen<args> }) &
+//   (deployless extends true
+//     ? { address?: undefined; code: Hex }
+//     : { address: Address });

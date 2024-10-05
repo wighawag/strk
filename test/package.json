@@ -15,6 +15,7 @@
     "prool": "^0.0.16",
     "prool-katana": "^0.0.2",
     "remote-procedure-call": "^0.0.12",
+    "tsx": "^4.19.1",
     "vitest": "^2.1.2"
   },
   "scripts": {
@@ -23,7 +24,7 @@
     "compile:only": "scarb build",
     "artifacts:watch": "as-soon -w target pnpm artifacts",
     "compile:watch": "as-soon -w src pnpm compile:only",
-    "test": "pnpm compile && vitest",
+    "test": "vitest",
     "format:check": "prettier --check ."
   }
 }
