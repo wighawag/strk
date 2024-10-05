@@ -46,37 +46,61 @@ async function checkTransaction(
 export async function waitForTransaction(
   rpc: ProxiedRPC<StarknetMethods>,
   transaction_hash: string,
-  options?: { checkIntervalInSeconds?: number; retries?: number }
+  options?: {
+    retryInterval?: number;
+    retries?: number;
+    timeout?: number;
+  }
 ): Promise<TXN_RECEIPT_WITH_BLOCK_INFO> {
-  const retry = !!options?.retries;
-  let retries = options?.retries || 0;
+  const startTime = performance.now();
+  const retry =
+    (options && options.retries && options.retries > 0) ||
+    options?.retries == undefined;
+  let retryInterval = options?.retryInterval || 3;
+  let startWithFastRetry = options?.retryInterval ? 0 : 3;
+  const retriesAtStart = options?.retries || 10;
+  let retries = retriesAtStart;
   let receiptForIncludedTransaction = await checkTransaction(
     rpc,
     transaction_hash
   );
-  if (retry && !receiptForIncludedTransaction) {
-    retries--;
-    if (retries <= 0) {
-      throw new Error(
-        `waitForTransaction timed-out with retries ${options?.retries || 0}`
-      );
+
+  function checkTimeout() {
+    if (options?.timeout) {
+      const elapsed = performance.now() - startTime;
+      if (elapsed > options.timeout * 1000) {
+        throw new Error(
+          `waitForTransaction timed-out as ${elapsed / 1000} seconds elapsed (more than the specified timeout: ${options.timeout})`
+        );
+      }
+    }
+    if (retry) {
+      retries--;
+      if (retries <= 0) {
+        throw new Error(
+          `waitForTransaction timed-out after ${retriesAtStart || 0} retries`
+        );
+      }
     }
   }
+  if (!receiptForIncludedTransaction) {
+    checkTimeout();
+  }
+
   while (!receiptForIncludedTransaction) {
-    if (options?.checkIntervalInSeconds) {
-      await wait(options.checkIntervalInSeconds);
+    if (startWithFastRetry <= 0) {
+      if (retryInterval) {
+        await wait(retryInterval);
+      }
+    } else {
+      startWithFastRetry--;
     }
     receiptForIncludedTransaction = await checkTransaction(
       rpc,
       transaction_hash
     );
-    if (retry && !receiptForIncludedTransaction) {
-      retries--;
-      if (retries <= 0) {
-        throw new Error(
-          `waitForTransaction timed-out with retries ${options?.retries || 0}`
-        );
-      }
+    if (!receiptForIncludedTransaction) {
+      checkTimeout();
     }
   }
   return receiptForIncludedTransaction;

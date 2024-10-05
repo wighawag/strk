@@ -1,5 +1,4 @@
 import {
-  create_declare_transaction_intent_v2,
   create_declare_transaction_v2,
   create_invoke_transaction_v1_from_calls,
 } from "strk";
@@ -13,14 +12,13 @@ import GreetingsRegistry from "../ts-artifacts/GreetingsRegistry.js";
 import { createProxiedJSONRPC } from "remote-procedure-call";
 import assert from "assert";
 import { waitForTransaction } from "../utils.js";
-import { formatSignature } from "starknet-core/utils/stark";
-import { sign } from "@scure/starknet";
 import { mkdirSync, writeFileSync } from "fs";
 import { calculateContractAddressFromHash } from "starknet-core/utils/hash";
 import { computePedersenHash } from "starknet-core/utils/hash";
 
 const rpc = createProxiedJSONRPC<StarknetMethods>("http://localhost:5050");
 
+console.log(`getting nonce...`);
 const nonceResponse = await rpc.starknet_getNonce({
   block_id: "pending",
   contract_address: test_accounts[0].contract_address,
@@ -35,13 +33,13 @@ const declaration_data = {
   max_fee: "0xFFFFFFFFFFFFFFFFFF",
   nonce,
   sender_address: test_accounts[0].contract_address,
+  private_key: test_accounts[0].private_key,
 };
 
-const declare_transaction_for_estimate = create_declare_transaction_v2({
-  ...declaration_data,
-  private_key: test_accounts[0].private_key,
-});
+const declare_transaction_for_estimate =
+  create_declare_transaction_v2(declaration_data);
 
+console.log(`estimating for declaration...`);
 const estimateFeeResponse = await rpc.starknet_estimateFee({
   block_id: "pending",
   request: [declare_transaction_for_estimate],
@@ -64,9 +62,9 @@ if (estimateFeeResponse.success) {
   const declare_transaction = create_declare_transaction_v2({
     ...declaration_data,
     max_fee: estimateFeeResponse.value[0].overall_fee,
-    private_key: test_accounts[0].private_key,
   });
 
+  console.log(`declaring...`);
   const declareResponse = await rpc.starknet_addDeclareTransaction({
     declare_transaction,
   });
@@ -79,10 +77,10 @@ if (estimateFeeResponse.success) {
     console.log(declareResponse.value);
   }
   assert(declareResponse.success);
+  console.log(`waiting for declaration receipt...`);
   let receipt = await waitForTransaction(
     rpc,
-    declareResponse.value.transaction_hash,
-    { checkIntervalInSeconds: 1 }
+    declareResponse.value.transaction_hash
   );
   assert(receipt.execution_status == "SUCCEEDED");
 } else {
@@ -91,6 +89,7 @@ if (estimateFeeResponse.success) {
 
 // --------------
 
+console.log(`getting nocnce...`);
 const nonce2Response = await rpc.starknet_getNonce({
   block_id: "pending",
   contract_address: test_accounts[0].contract_address,
@@ -115,24 +114,21 @@ const invoke_data = {
   max_fee: "0xFFFFFFFFFFFFFFFFFF",
   nonce: nonce2,
   sender_address: test_accounts[0].contract_address,
+  private_key: test_accounts[0].private_key,
 };
 
 const invoke_transaction_for_estimate = create_invoke_transaction_v1_from_calls(
   {
     ...invoke_data,
-    private_key: test_accounts[0].private_key,
   }
 );
 
+console.log(`estimating fee for deployment...`);
 const inokeEstimateFeeResponse = await rpc.starknet_estimateFee({
   block_id: "pending",
   request: [invoke_transaction_for_estimate],
   simulation_flags: [],
-  //   simulation_flags: ["SKIP_VALIDATE"],
   // TODO fix starknet-io/type-js or katana ? seems to be mandatory field
-  // TODO wehn using "SKIP_VALIDATE" as simulation_flags element, the estimated fee is off
-  // but katana do not reject the tx with that fee, and instead drop the tx at a later stage
-  // this result in `waitForTransaction` to hang forever
 });
 
 if (!inokeEstimateFeeResponse.success) {
@@ -145,9 +141,9 @@ console.log({ estimate: inokeEstimateFeeResponse.value });
 const invoke_transaction = create_invoke_transaction_v1_from_calls({
   ...invoke_data,
   max_fee: inokeEstimateFeeResponse.value[0].overall_fee,
-  private_key: test_accounts[0].private_key,
 });
 
+console.log(`deploying....`);
 const invokeResponse = await rpc.starknet_addInvokeTransaction({
   invoke_transaction,
 });
@@ -160,11 +156,14 @@ if (!invokeResponse.success) {
   console.log(invokeResponse.value);
 }
 assert(invokeResponse.success);
+console.log(`waiting for deployment receipt...`);
 let receipt = await waitForTransaction(
   rpc,
-  invokeResponse.value.transaction_hash,
-  { checkIntervalInSeconds: 1 }
+  invokeResponse.value.transaction_hash
 );
+if (receipt.execution_status !== "SUCCEEDED") {
+  console.log(receipt);
+}
 assert(receipt.execution_status == "SUCCEEDED");
 console.log(receipt);
 
@@ -190,6 +189,7 @@ if (expectedContractAddress !== contract_address) {
   );
 }
 
+console.log(`writing to files...`);
 mkdirSync("deployments/localhost", { recursive: true });
 writeFileSync(
   `deployments/localhost/GreetingsRegistry.json`,
@@ -203,3 +203,4 @@ writeFileSync(
     2
   )
 );
+console.log(`DONE`);
