@@ -15,6 +15,9 @@ import assert from "assert";
 import { waitForTransaction } from "../utils.js";
 import { formatSignature } from "starknet-core/utils/stark";
 import { sign } from "@scure/starknet";
+import { mkdirSync, writeFileSync } from "fs";
+import { calculateContractAddressFromHash } from "starknet-core/utils/hash";
+import { computePedersenHash } from "starknet-core/utils/hash";
 
 const rpc = createProxiedJSONRPC<StarknetMethods>("http://localhost:5050");
 
@@ -40,7 +43,7 @@ const declare_transaction_for_estimate = create_declare_transaction_v2({
 });
 
 const estimateFeeResponse = await rpc.starknet_estimateFee({
-  block_id: "latest",
+  block_id: "pending",
   request: [declare_transaction_for_estimate],
   simulation_flags: [],
   //   simulation_flags: ["SKIP_VALIDATE"],
@@ -92,10 +95,13 @@ const nonce2Response = await rpc.starknet_getNonce({
   block_id: "pending",
   contract_address: test_accounts[0].contract_address,
 });
-assert(nonceResponse.success);
-const nonce2 = nonceResponse.value;
+assert(nonce2Response.success);
+const nonce2 = nonce2Response.value;
 console.log({ nonce });
 
+const salt = 0;
+const unique = true;
+const prefix = 0;
 const invoke_data = {
   chain_id: KATANA_CHAIN_ID,
   calls: [
@@ -103,7 +109,7 @@ const invoke_data = {
       //https://github.com/dojoengine/dojo/blob/main/crates/katana/contracts/universal_deployer.cairo
       contractAddress: UniversalDeployerContract.contract_address,
       entrypoint: "deployContract",
-      calldata: [GreetingsRegistry.class_hash, 0, true, ["0x0"]],
+      calldata: [GreetingsRegistry.class_hash, salt, unique, [prefix]],
     },
   ],
   max_fee: "0xFFFFFFFFFFFFFFFFFF",
@@ -119,7 +125,7 @@ const invoke_transaction_for_estimate = create_invoke_transaction_v1_from_calls(
 );
 
 const inokeEstimateFeeResponse = await rpc.starknet_estimateFee({
-  block_id: "latest",
+  block_id: "pending",
   request: [invoke_transaction_for_estimate],
   simulation_flags: [],
   //   simulation_flags: ["SKIP_VALIDATE"],
@@ -161,3 +167,39 @@ let receipt = await waitForTransaction(
 );
 assert(receipt.execution_status == "SUCCEEDED");
 console.log(receipt);
+
+const contract_address = receipt.events[0].data[0];
+
+const expectedContractAddress = unique
+  ? calculateContractAddressFromHash(
+      computePedersenHash(test_accounts[0].contract_address, salt),
+      GreetingsRegistry.class_hash,
+      [prefix],
+      UniversalDeployerContract.contract_address
+    )
+  : calculateContractAddressFromHash(
+      salt,
+      GreetingsRegistry.class_hash,
+      [prefix],
+      0
+    );
+
+if (expectedContractAddress !== contract_address) {
+  console.error(
+    `expected ${expectedContractAddress}but got ${contract_address}`
+  );
+}
+
+mkdirSync("deployments/localhost", { recursive: true });
+writeFileSync(
+  `deployments/localhost/GreetingsRegistry.json`,
+  JSON.stringify(
+    {
+      address: contract_address,
+      abi: JSON.parse(GreetingsRegistry.abi),
+      artifact: GreetingsRegistry,
+    },
+    null,
+    2
+  )
+);
