@@ -12,8 +12,8 @@ importers:
         specifier: ^0.0.3
         version: 0.0.3
       strk:
-        specifier: ^0.0.12
-        version: 0.0.12
+        specifier: link:..
+        version: link:..
     devDependencies:
       '@starknet-io/types-js':
         specifier: ^0.7.7
@@ -779,9 +779,6 @@ packages:
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
 
-  starknet-core@0.0.2:
-    resolution: {integrity: sha512-/+H49M0+v/0h4gv3WktUtrd9f/mF/hwWqM/oC08uMgrrwOMHZYJwGWN/8ygm4yXzGi8JHK7CZcyx/zOqgA3evg==}
-
   starknet-core@0.0.3:
     resolution: {integrity: sha512-Ys/7x5ipRPah5qRLDtMPSFsSsiwIhlQGbEAG4xVBg/1sboqpOLYLYlrVlEB/xu/h97l1sfI/aLrbnRrswaZ8TQ==}
 
@@ -807,9 +804,6 @@ packages:
   strip-final-newline@4.0.0:
     resolution: {integrity: sha512-aulFJcD6YK8V1G7iRB5tigAP4TsHBZZrOV8pjV++zdUwmeV8uzbY7yn6h9MswN62adStNZFuCIx4haBnRuMDaw==}
     engines: {node: '>=18'}
-
-  strk@0.0.12:
-    resolution: {integrity: sha512-SsEKyXFEdgFBpR+JtGXQSs5j9HyMp8Bo6NbYXw/HZZf90dKJDCyuvqt5QQuqHmnO1RN2otH6t6g6187LsCSqpw==}
 
   tar@7.2.0:
     resolution: {integrity: sha512-hctwP0Nb4AB60bj8WQgRYaMOuJYRAPMGiQUAotms5igN8ppfQM+IvjQ5HcKu1MaZh2Wy2KWVTe563Yj8dfc14w==}
@@ -1555,15 +1549,6 @@ snapshots:
 
   stackback@0.0.2: {}
 
-  starknet-core@0.0.2:
-    dependencies:
-      '@noble/curves': 1.6.0
-      '@noble/hashes': 1.5.0
-      '@scure/base': 1.1.9
-      '@scure/starknet': 1.0.0
-      '@starknet-io/types-js': 0.7.7
-      pako: 2.1.0
-
   starknet-core@0.0.3:
     dependencies:
       '@noble/curves': 1.6.0
@@ -1596,11 +1581,6 @@ snapshots:
       ansi-regex: 6.1.0
 
   strip-final-newline@4.0.0: {}
-
-  strk@0.0.12:
-    dependencies:
-      '@scure/starknet': 1.0.0
-      starknet-core: 0.0.2
 
   tar@7.2.0:
     dependencies:

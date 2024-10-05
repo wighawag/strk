@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "starknet-core": "^0.0.3",
-    "strk": "^0.0.12"
+    "strk": "link:.."
   },
   "devDependencies": {
     "@starknet-io/types-js": "^0.7.7",
