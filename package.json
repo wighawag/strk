@@ -1,6 +1,6 @@
 {
   "name": "strk",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "",
   "type": "module",
   "main": "./dist/index.js",
@@ -11,6 +11,12 @@
       "import": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      }
+    },
+    "./types/rpc/components": {
+      "import": {
+        "types": "./dist/types/rpc/components.d.ts",
+        "default": "./dist/types/rpc/components.js"
       }
     },
     "./utils": {
