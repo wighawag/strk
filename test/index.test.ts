@@ -14,14 +14,9 @@ import {
 } from "starknet-core/utils/shortString";
 import { CallData } from "starknet-core/utils/calldata";
 import {
-  getSelectorFromName,
   calculateContractAddressFromHash,
-  computePoseidonHashOnElements,
-  computePedersenHashOnElements,
   computePedersenHash,
 } from "starknet-core/utils/hash";
-import { toHex } from "starknet-core/utils/num";
-import { starknetKeccak } from "starknet-core/utils/hash";
 import GreetingsRegistry from "./ts-artifacts/GreetingsRegistry.js";
 import {
   KATANA_CHAIN_ID,
@@ -76,7 +71,8 @@ test("declare_GreetingsRegistry_again", async function () {
   assert(declareResponse.success);
   let receipt = await waitForTransaction(
     rpc,
-    declareResponse.value.transaction_hash
+    declareResponse.value.transaction_hash,
+    { retries: 4 }
   );
   expect(receipt.execution_status).to.equals("SUCCEEDED");
 });

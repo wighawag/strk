@@ -5,7 +5,8 @@ export const poolId =
     Number(process.env.VITEST_SHARD_ID ?? 1) +
   (process.env.VITE_NETWORK_TRANSPORT_MODE === "webSocket" ? 100 : 0);
 
-export const RPC_URL = `http://localhost:5051/${poolId}`;
+// export const RPC_URL = `http://localhost:5051/${poolId}`;
+export const RPC_URL = `http://localhost:5050`;
 
 // Reset the katana instances
 export async function resetKatana() {

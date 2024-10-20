@@ -56,7 +56,7 @@ export async function waitForTransaction(
   const retry =
     (options && options.retries && options.retries > 0) ||
     options?.retries == undefined;
-  let retryInterval = options?.retryInterval || 3;
+  let retryInterval = options?.retryInterval || 1;
   let startWithFastRetry = options?.retryInterval ? 0 : 3;
   const retriesAtStart = options?.retries || 10;
   let retries = retriesAtStart;
@@ -93,6 +93,7 @@ export async function waitForTransaction(
         await wait(retryInterval);
       }
     } else {
+      await wait(0.1);
       startWithFastRetry--;
     }
     receiptForIncludedTransaction = await checkTransaction(

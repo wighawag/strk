@@ -31,8 +31,8 @@ importers:
         specifier: ^0.0.16
         version: 0.0.16
       prool-katana:
-        specifier: ^0.0.2
-        version: 0.0.2(prool@0.0.16)
+        specifier: ^0.0.3
+        version: 0.0.3(prool@0.0.16)
       remote-procedure-call:
         specifier: ^0.0.12
         version: 0.0.12(@types/node@22.7.4)
@@ -883,8 +883,8 @@ packages:
   promise-throttle@1.1.2:
     resolution: {integrity: sha512-dij7vjyXNewuuN/gyr+TX2KRjw48mbV5FEtgyXaIoJjGYAKT0au23/voNvy9eS4UNJjx2KUdEcO5Yyfc1h7vWQ==}
 
-  prool-katana@0.0.2:
-    resolution: {integrity: sha512-SEVH8A1W3SKBbj5fIdv/ceHY+EGRbpH5FFPtqA2lcrSfHfp7OLbw6J/pyS6Tc594y1L+0BtafbrPrbYMFivMXg==}
+  prool-katana@0.0.3:
+    resolution: {integrity: sha512-65yE3qNztI0XqiOXDq9rTCZRv+RNnPdpyRubnOAzTNBAzo9rZ85QDC84ayJlqMbitRpHURMgieYVGt8dKtNQkg==}
     peerDependencies:
       prool: ^0.0.16
 
@@ -1736,7 +1736,7 @@ snapshots:
 
   promise-throttle@1.1.2: {}
 
-  prool-katana@0.0.2(prool@0.0.16):
+  prool-katana@0.0.3(prool@0.0.16):
     dependencies:
       prool: 0.0.16
 
