@@ -22,7 +22,7 @@ import {
   KATANA_CHAIN_ID,
   test_accounts,
   UniversalDeployerContract,
-} from "./katana.js";
+} from "katana-rpc";
 import { waitForTransaction } from "./utils.js";
 
 const rpc = createProxiedJSONRPC<StarknetMethods>(RPC_URL);

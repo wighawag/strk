@@ -24,15 +24,15 @@ importers:
       as-soon:
         specifier: ^0.0.9
         version: 0.0.9
+      katana-rpc:
+        specifier: ^0.0.1
+        version: 0.0.1(prool@0.0.16)
       prettier:
         specifier: ^3.2.5
         version: 3.3.3
       prool:
         specifier: ^0.0.16
         version: 0.0.16
-      prool-katana:
-        specifier: ^0.0.3
-        version: 0.0.3(prool@0.0.16)
       remote-procedure-call:
         specifier: ^0.0.12
         version: 0.0.12(@types/node@22.7.4)
@@ -773,6 +773,11 @@ packages:
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
 
+  katana-rpc@0.0.1:
+    resolution: {integrity: sha512-rT4F79Uyva2R/wXxMUYeclMvTAYkst/3WsCLjfirqLTAjbgCMv4PTYfdAp28XZUFUkVieYwpfj1f9csgHjhZsw==}
+    peerDependencies:
+      prool: ^0.0.16
+
   ldenv@0.3.10:
     resolution: {integrity: sha512-mZctJeb8OvSkPJ1JL7s/VYUambMpStM4e9C8f2iE24DXi8y0IeQm012xfNK9/BAgv1rH+4GcjvTcxMRfR5mxfA==}
     hasBin: true
@@ -882,11 +887,6 @@ packages:
 
   promise-throttle@1.1.2:
     resolution: {integrity: sha512-dij7vjyXNewuuN/gyr+TX2KRjw48mbV5FEtgyXaIoJjGYAKT0au23/voNvy9eS4UNJjx2KUdEcO5Yyfc1h7vWQ==}
-
-  prool-katana@0.0.3:
-    resolution: {integrity: sha512-65yE3qNztI0XqiOXDq9rTCZRv+RNnPdpyRubnOAzTNBAzo9rZ85QDC84ayJlqMbitRpHURMgieYVGt8dKtNQkg==}
-    peerDependencies:
-      prool: ^0.0.16
 
   prool@0.0.16:
     resolution: {integrity: sha512-s+i66jsINIJQd8w5iGunT8hCeM6RSXjL8qgXDTvcIuaAOjVRVMh0/PgbJ90KR3JAprXWXpa5XQnDEc4fLnvy1Q==}
@@ -1649,6 +1649,10 @@ snapshots:
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
 
+  katana-rpc@0.0.1(prool@0.0.16):
+    dependencies:
+      prool: 0.0.16
+
   ldenv@0.3.10:
     dependencies:
       dotenv: 16.4.5
@@ -1735,10 +1739,6 @@ snapshots:
       parse-ms: 4.0.0
 
   promise-throttle@1.1.2: {}
-
-  prool-katana@0.0.3(prool@0.0.16):
-    dependencies:
-      prool: 0.0.16
 
   prool@0.0.16:
     dependencies:
