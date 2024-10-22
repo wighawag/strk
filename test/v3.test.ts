@@ -4,8 +4,8 @@ import { Methods as StarknetMethods } from "@starknet-io/types-js";
 import assert from "assert";
 import { RPC_URL } from "./prool/index.js";
 import {
-  create_declare_transaction_v2,
-  create_invoke_transaction_v1_from_calls,
+  create_declare_transaction_v3,
+  create_invoke_transaction_v3_from_calls,
   create_call,
 } from "strk";
 import {
@@ -35,12 +35,15 @@ test("starknet_chainId", async function () {
 });
 
 test("declare_GreetingsRegistry", async function () {
-  const declare_transaction = create_declare_transaction_v2({
+  const declare_transaction = create_declare_transaction_v3({
     chain_id: KATANA_CHAIN_ID,
     contract: GreetingsRegistry,
-    max_fee: "0xFFFFFFFFFFFFFFFFFF",
     nonce: "0x0",
     sender_address: test_accounts[0].contract_address,
+    resource_bounds: {
+      l1_gas: { max_amount: 0, max_price_per_unit: 0 },
+      l2_gas: { max_amount: 0, max_price_per_unit: 0 },
+    },
     private_key: test_accounts[0].private_key,
   });
   const declareResponse = await rpc.starknet_addDeclareTransaction({
@@ -56,10 +59,13 @@ test("declare_GreetingsRegistry", async function () {
 });
 
 test("declare_GreetingsRegistry_again", async function () {
-  const declare_transaction = create_declare_transaction_v2({
+  const declare_transaction = create_declare_transaction_v3({
     chain_id: KATANA_CHAIN_ID,
     contract: GreetingsRegistry,
-    max_fee: "0xFFFFFFFFFFFFFFFFFF",
+    resource_bounds: {
+      l1_gas: { max_amount: 0, max_price_per_unit: 0 },
+      l2_gas: { max_amount: 0, max_price_per_unit: 0 },
+    },
     nonce: "0x1",
     sender_address: test_accounts[0].contract_address,
     private_key: test_accounts[0].private_key,
@@ -86,7 +92,7 @@ test("deploy_GreetingsRegistry", async function () {
   }
   const unique = true;
   const salt = 0;
-  const invoke_transaction = create_invoke_transaction_v1_from_calls({
+  const invoke_transaction = create_invoke_transaction_v3_from_calls({
     chain_id: KATANA_CHAIN_ID,
     calls: [
       {
@@ -96,7 +102,10 @@ test("deploy_GreetingsRegistry", async function () {
         calldata: [GreetingsRegistry.class_hash, salt, unique, [prefix]],
       },
     ],
-    max_fee: "0xFFFFFFFFFFFFFFFFFF",
+    resource_bounds: {
+      l1_gas: { max_amount: 0, max_price_per_unit: 0 },
+      l2_gas: { max_amount: 0, max_price_per_unit: 0 },
+    },
     nonce: "0x1",
     sender_address: test_accounts[0].contract_address,
     private_key: test_accounts[0].private_key,
@@ -170,7 +179,7 @@ test("invoke_GreetingsRegistry", async function () {
   const calldataParser = new CallData(abi);
 
   const messageAsFelt = encodeShortString(message);
-  const invoke_transaction = create_invoke_transaction_v1_from_calls({
+  const invoke_transaction = create_invoke_transaction_v3_from_calls({
     chain_id: KATANA_CHAIN_ID,
     calls: [
       {
@@ -179,7 +188,10 @@ test("invoke_GreetingsRegistry", async function () {
         calldata: calldataParser.compile("setMessage", ["hello", 12]),
       },
     ],
-    max_fee: "0xFFFFFFFFFFFFFFFFFF",
+    resource_bounds: {
+      l1_gas: { max_amount: 0, max_price_per_unit: 0 },
+      l2_gas: { max_amount: 0, max_price_per_unit: 0 },
+    },
     nonce: "0x2",
     sender_address: test_accounts[0].contract_address,
     private_key: test_accounts[0].private_key,

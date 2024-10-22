@@ -11,6 +11,8 @@ import { BROADCASTED_DECLARE_TXN_V3 } from "../../starknet-types/api/components.
 
 import type { Contract } from "../common/index.js";
 import { DeepReadonly } from "../../type-utils/index.js";
+import { toLowLevelResourceBound } from "./utils.js";
+import { ResourceBounds } from "./types.js";
 
 export function create_declare_transaction_intent_v3(args: {
   sender_address: string;
@@ -36,20 +38,7 @@ export function create_declare_transaction_intent_v3(args: {
     version: "0x3",
     sender_address: args.sender_address,
     nonce: toHex(args.nonce),
-    resource_bounds: {
-      l1_gas: {
-        max_amount: toHex(args.resource_bounds.l1_gas.max_amount),
-        max_price_per_unit: toHex(
-          args.resource_bounds.l1_gas.max_price_per_unit
-        ),
-      },
-      l2_gas: {
-        max_amount: toHex(args.resource_bounds.l2_gas.max_amount),
-        max_price_per_unit: toHex(
-          args.resource_bounds.l2_gas.max_price_per_unit
-        ),
-      },
-    }, // TODO
+    resource_bounds: toLowLevelResourceBound(args.resource_bounds), // TODO
     tip: "0x0", // TODO
     paymaster_data: [], // TODO
     account_deployment_data: [], // TODO
@@ -79,10 +68,7 @@ export function create_declare_transaction_v3(
   args: {
     sender_address: string;
     nonce: BigNumberish;
-    resource_bounds: {
-      l1_gas: { max_amount: BigNumberish; max_price_per_unit: BigNumberish };
-      l2_gas: { max_amount: BigNumberish; max_price_per_unit: BigNumberish };
-    };
+    resource_bounds: ResourceBounds;
     contract: Contract;
     chain_id: string;
   } & { private_key: string }
