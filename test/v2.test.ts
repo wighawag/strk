@@ -34,7 +34,7 @@ test("starknet_chainId", async function () {
   expect(chainIdResponse.value).to.equal(KATANA_CHAIN_ID);
 });
 
-test("declare_v2_GreetingsRegistry", async function () {
+test("declare_GreetingsRegistry", async function () {
   const declare_transaction = create_declare_transaction_v2({
     chain_id: KATANA_CHAIN_ID,
     contract: GreetingsRegistry,
@@ -55,7 +55,7 @@ test("declare_v2_GreetingsRegistry", async function () {
   expect(receipt.execution_status).to.equals("SUCCEEDED");
 });
 
-test("declare_v2_GreetingsRegistry_again", async function () {
+test("declare_GreetingsRegistry_again", async function () {
   const declare_transaction = create_declare_transaction_v2({
     chain_id: KATANA_CHAIN_ID,
     contract: GreetingsRegistry,
@@ -86,7 +86,7 @@ test("deploy_GreetingsRegistry", async function () {
   }
   const unique = true;
   const salt = 0;
-  const invoke_transaction = create_invoke_transaction_v1_from_calls({
+  const invocation_data = {
     chain_id: KATANA_CHAIN_ID,
     calls: [
       {
@@ -100,10 +100,34 @@ test("deploy_GreetingsRegistry", async function () {
     nonce: "0x1",
     sender_address: test_accounts[0].contract_address,
     private_key: test_accounts[0].private_key,
+  };
+  const invoke_transaction =
+    create_invoke_transaction_v1_from_calls(invocation_data);
+  const estimateFeeResponse = await rpc.starknet_estimateFee({
+    block_id: "pending",
+    request: [invoke_transaction],
+    simulation_flags: [],
+    // simulation_flags: ["SKIP_VALIDATE"],
+    // TODO fix starknet-io/type-js or katana ? seems to be mandatory field
+    // TODO wehn using "SKIP_VALIDATE" as simulation_flags element, the estimated fee is off
+    // but katana do not reject the tx with that fee, and instead drop the tx at a later stage
+    // this result in `waitForTransaction` to hang forever
   });
+
+  if (!estimateFeeResponse.success) {
+    console.error(estimateFeeResponse.error);
+  }
+  assert(estimateFeeResponse.success);
+
   const invokeResponse = await rpc.starknet_addInvokeTransaction({
-    invoke_transaction,
+    invoke_transaction: create_invoke_transaction_v1_from_calls({
+      ...invocation_data,
+      max_fee: estimateFeeResponse.value[0].overall_fee,
+    }),
   });
+  if (!invokeResponse.success) {
+    console.error(invokeResponse.error);
+  }
   expect(invokeResponse.success).to.be.true;
 
   assert(invokeResponse.success);
@@ -111,6 +135,10 @@ test("deploy_GreetingsRegistry", async function () {
     rpc,
     invokeResponse.value.transaction_hash
   );
+
+  if (receipt.execution_status !== "SUCCEEDED") {
+    console.error(receipt);
+  }
   expect(receipt.execution_status).to.equals("SUCCEEDED");
 
   // const lastBlockResponse = await rpc.starknet_blockNumber();
