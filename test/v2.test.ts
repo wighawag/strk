@@ -40,16 +40,20 @@ const privateKey =
   "0x2dccce1da22003777062ee0870e9881b460a8b7eca276870f57c601f182136c";
 const publicKey = getStarkKey(privateKey);
 
+// ---------------------------
+// Technically not needed, as publick key is just a felt and can this be passed in as is
+// ---------------------------
 const contractCallData: CallData = new CallData(
   JSON.parse(AccountContract.abi)
 );
 const contractConstructor: Calldata = contractCallData.compile("constructor", {
   public_key: publicKey,
 });
+// ---------------------------
 const accountContractAddress = hash.calculateContractAddressFromHash(
   publicKey,
   AccountContract.class_hash,
-  contractConstructor,
+  contractConstructor, // or [publicKey]
   0
 );
 const test_account_new = {
