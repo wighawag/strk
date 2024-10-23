@@ -7,7 +7,7 @@ import {
   KATANA_CHAIN_ID,
   test_accounts,
   UniversalDeployerContract,
-} from "../katana.js";
+} from "katana-rpc";
 import GreetingsRegistry from "../ts-artifacts/GreetingsRegistry.js";
 import { createProxiedJSONRPC } from "remote-procedure-call";
 import assert from "assert";
@@ -89,7 +89,7 @@ if (estimateFeeResponse.success) {
 
 // --------------
 
-console.log(`getting nocnce...`);
+console.log(`getting nonce...`);
 const nonce2Response = await rpc.starknet_getNonce({
   block_id: "pending",
   contract_address: test_accounts[0].contract_address,
