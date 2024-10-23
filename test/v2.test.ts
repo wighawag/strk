@@ -27,11 +27,10 @@ import {
   ETHTokenContract,
 } from "katana-rpc";
 import ERC20 from "./abis/ERC20.js";
-import { getPublicKey, getStarkKey } from "@scure/starknet";
+import { getStarkKey } from "@scure/starknet";
 import { hash } from "starknet-core";
 
 import AccountContract from "./ts-artifacts/Account.js";
-import { computeCompiledClassHash } from "starknet-core/utils/hash";
 import { Calldata } from "starknet-core";
 import { waitForTransaction } from "./utils.js";
 
