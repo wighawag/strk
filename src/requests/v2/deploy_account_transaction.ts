@@ -19,7 +19,7 @@ import { DeepReadonly } from "../../type-utils/index.js";
 export function create_deploy_account_transaction_intent_v1(args: {
   chain_id: string;
   class_hash: string;
-  constructor_calldata: BigNumberish[];
+  constructor_calldata: readonly BigNumberish[];
   contract_address_salt: BigNumberish;
   max_fee: BigNumberish;
   nonce: BigNumberish;
@@ -63,7 +63,7 @@ export function create_deploy_account_transaction_v1(
   args: {
     chain_id: string;
     class_hash: string;
-    constructor_calldata: BigNumberish[];
+    constructor_calldata: readonly BigNumberish[];
     contract_address_salt: BigNumberish;
     max_fee: BigNumberish;
     nonce: BigNumberish;

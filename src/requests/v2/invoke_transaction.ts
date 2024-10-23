@@ -18,7 +18,7 @@ import { CallData } from "starknet-core";
 export function create_invoke_transaction_intent_v1(args: {
   chain_id: string;
   sender_address: string;
-  calldata: BigNumberish[];
+  calldata: readonly BigNumberish[];
   max_fee: BigNumberish;
   nonce: BigNumberish;
 }) {
@@ -47,7 +47,7 @@ export function create_invoke_transaction_v1(
   args: {
     chain_id: string;
     sender_address: string;
-    calldata: BigNumberish[];
+    calldata: readonly BigNumberish[];
     max_fee: BigNumberish;
     nonce: BigNumberish;
   } & { private_key: string }
@@ -65,11 +65,11 @@ export function create_invoke_transaction_v1(
 export function create_invoke_transaction_intent_v1_from_calls(args: {
   chain_id: string;
   sender_address: string;
-  calls: Call[];
+  calls: readonly Call[];
   max_fee: BigNumberish;
   nonce: BigNumberish;
 }) {
-  const calldata = getExecuteCalldata(args.calls, "1");
+  const calldata = getExecuteCalldata(args.calls as Call[], "1"); // readonly
 
   return create_invoke_transaction_intent_v1({
     chain_id: args.chain_id,
@@ -84,7 +84,7 @@ export function create_invoke_transaction_v1_from_calls(
   args: {
     chain_id: string;
     sender_address: string;
-    calls: Call[];
+    calls: readonly Call[];
     max_fee: BigNumberish;
     nonce: BigNumberish;
   } & { private_key: string }
@@ -102,7 +102,7 @@ export function create_invoke_transaction_v1_from_calls(
 export function create_invoke_transaction_intent_v1_from_calls_with_abi(args: {
   chain_id: string;
   sender_address: string;
-  calls: CallWithABI[];
+  calls: readonly CallWithABI[];
   max_fee: BigNumberish;
   nonce: BigNumberish;
 }) {
@@ -132,7 +132,7 @@ export function create_invoke_transaction_v1_from_calls_with_abi(
   args: {
     chain_id: string;
     sender_address: string;
-    calls: CallWithABI[];
+    calls: readonly CallWithABI[];
     max_fee: BigNumberish;
     nonce: BigNumberish;
   } & { private_key: string }
@@ -147,31 +147,3 @@ export function create_invoke_transaction_v1_from_calls_with_abi(
     signature,
   };
 }
-
-// const compiledCalldata = getExecuteCalldata(transactions, details.cairoVersion);
-// let msgHash;
-
-// // TODO: How to do generic union discriminator for all like this
-// if (Object.values(ETransactionVersion2).includes(details.version as any)) {
-//   const det = details as V2InvocationsSignerDetails;
-//   msgHash = calculateInvokeTransactionHash({
-//     ...det,
-//     senderAddress: det.walletAddress,
-//     compiledCalldata,
-//     version: det.version,
-//   });
-// } else if (
-//   Object.values(ETransactionVersion3).includes(details.version as any)
-// ) {
-//   const det = details as V3InvocationsSignerDetails;
-//   msgHash = calculateInvokeTransactionHash({
-//     ...det,
-//     senderAddress: det.walletAddress,
-//     compiledCalldata,
-//     version: det.version,
-//     nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
-//     feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
-//   });
-// } else {
-//   throw Error("unsupported signTransaction version");
-// }
