@@ -33,6 +33,7 @@ import { hash } from "starknet-core";
 import AccountContract from "./ts-artifacts/Account.js";
 import { computeCompiledClassHash } from "starknet-core/utils/hash";
 import { Calldata } from "starknet-core";
+import { waitForTransaction } from "./utils.js";
 
 const rpc = createProxiedJSONRPC<StarknetMethods>(RPC_URL);
 
