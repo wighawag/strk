@@ -12,6 +12,8 @@ import { calculateTransactionHash as calculateInvokeTransactionHashV1 } from "st
 // @starknet-io/types-js
 import { INVOKE_TXN_V1 } from "../../starknet-types/api/components.js";
 import { DeepReadonly } from "../../type-utils/index.js";
+import { CallWithABI } from "./types.js";
+import { CallData } from "starknet-core";
 
 export function create_invoke_transaction_intent_v1(args: {
   chain_id: string;
@@ -88,6 +90,55 @@ export function create_invoke_transaction_v1_from_calls(
   } & { private_key: string }
 ) {
   const { data, hash } = create_invoke_transaction_intent_v1_from_calls(args);
+
+  const signature = formatSignature(sign(hash, args.private_key));
+
+  return {
+    ...data,
+    signature,
+  };
+}
+
+export function create_invoke_transaction_intent_v1_from_calls_with_abi(args: {
+  chain_id: string;
+  sender_address: string;
+  calls: CallWithABI[];
+  max_fee: BigNumberish;
+  nonce: BigNumberish;
+}) {
+  const calls = args.calls.map((call) => {
+    const calldataParser = new CallData(call.abi);
+    const calldata = calldataParser.compile(call.entrypoint, call.args || []);
+    const actualCall: Call = {
+      contractAddress: call.contractAddress,
+      entrypoint: call.entrypoint,
+      calldata,
+    };
+    return actualCall;
+  });
+
+  const calldata = getExecuteCalldata(calls, "1");
+
+  return create_invoke_transaction_intent_v1({
+    chain_id: args.chain_id,
+    sender_address: args.sender_address,
+    calldata,
+    max_fee: args.max_fee,
+    nonce: args.nonce,
+  });
+}
+
+export function create_invoke_transaction_v1_from_calls_with_abi(
+  args: {
+    chain_id: string;
+    sender_address: string;
+    calls: CallWithABI[];
+    max_fee: BigNumberish;
+    nonce: BigNumberish;
+  } & { private_key: string }
+) {
+  const { data, hash } =
+    create_invoke_transaction_intent_v1_from_calls_with_abi(args);
 
   const signature = formatSignature(sign(hash, args.private_key));
 

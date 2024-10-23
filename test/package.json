@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
+    "@scure/starknet": "^1.0.0",
     "starknet-core": "^0.0.3",
     "strk": "link:.."
   },
@@ -11,9 +12,9 @@
     "@starknet-io/types-js": "^0.7.7",
     "@types/node": "^22.7.4",
     "as-soon": "^0.0.9",
+    "katana-rpc": "^0.0.1",
     "prettier": "^3.2.5",
     "prool": "^0.0.16",
-    "katana-rpc": "^0.0.1",
     "remote-procedure-call": "^0.0.12",
     "tsx": "^4.19.1",
     "vitest": "^2.1.2"
