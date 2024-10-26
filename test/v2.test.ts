@@ -206,14 +206,7 @@ test("declare_GreetingsRegistry_again", async function () {
   const declareResponse = await rpc.starknet_addDeclareTransaction({
     declare_transaction,
   });
-  expect(declareResponse.success).to.be.true;
-  assert(declareResponse.success);
-  let receipt = await waitForTransaction(
-    rpc,
-    declareResponse.value.transaction_hash,
-    { retries: 4 }
-  );
-  expect(receipt.execution_status).to.equals("SUCCEEDED");
+  expect(declareResponse.success).to.be.false;
 });
 
 let contractAddress: string;
