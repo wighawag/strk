@@ -12,7 +12,7 @@
     "@starknet-io/types-js": "^0.7.7",
     "@types/node": "^22.7.4",
     "as-soon": "^0.0.9",
-    "katana-rpc": "^0.0.1",
+    "katana-rpc": "^0.0.4",
     "prettier": "^3.2.5",
     "prool": "^0.0.16",
     "remote-procedure-call": "^0.0.12",

@@ -2,7 +2,7 @@ import { test, expect } from "vitest";
 import { createProxiedJSONRPC } from "remote-procedure-call";
 import { Methods as StarknetMethods } from "@starknet-io/types-js";
 import assert from "assert";
-import { RPC_URL } from "./prool/index.js";
+import { KATANA_RPC_URL } from "./prool/node-instances.js";
 import {
   create_declare_transaction_v2,
   create_invoke_transaction_v1_from_calls,
@@ -34,7 +34,7 @@ import AccountContract from "./ts-artifacts/Account.js";
 import { Calldata } from "starknet-core";
 import { waitForTransaction } from "./utils.js";
 
-const rpc = createProxiedJSONRPC<StarknetMethods>(RPC_URL);
+const rpc = createProxiedJSONRPC<StarknetMethods>(KATANA_RPC_URL);
 
 const privateKey =
   "0x2dccce1da22003777062ee0870e9881b460a8b7eca276870f57c601f182136c";

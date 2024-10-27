@@ -28,8 +28,8 @@ importers:
         specifier: ^0.0.9
         version: 0.0.9
       katana-rpc:
-        specifier: ^0.0.1
-        version: 0.0.1(prool@0.0.16)
+        specifier: ^0.0.4
+        version: 0.0.4(prool@0.0.16)
       prettier:
         specifier: ^3.2.5
         version: 3.3.3
@@ -776,8 +776,8 @@ packages:
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
 
-  katana-rpc@0.0.1:
-    resolution: {integrity: sha512-rT4F79Uyva2R/wXxMUYeclMvTAYkst/3WsCLjfirqLTAjbgCMv4PTYfdAp28XZUFUkVieYwpfj1f9csgHjhZsw==}
+  katana-rpc@0.0.4:
+    resolution: {integrity: sha512-loBvxF3N3yVf7ONVacxdbdsCIZHJ7ZGvWbYqI9inEq6rIV+ys5WVd+1nyoE3ihIIvW4Ejxl1+9fRVMuWwBd2ug==}
     peerDependencies:
       prool: ^0.0.16
 
@@ -1652,7 +1652,7 @@ snapshots:
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
 
-  katana-rpc@0.0.1(prool@0.0.16):
+  katana-rpc@0.0.4(prool@0.0.16):
     dependencies:
       prool: 0.0.16
 
